@@ -25,5 +25,18 @@ class TodoListViewController: UITableViewController {
         cell.textLabel?.text = itemsArray[indexPath.row]
         return cell
     }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        let currentCell = tableView.cellForRow(at: indexPath)
+        
+        if currentCell?.accessoryType == .checkmark {
+            currentCell?.accessoryType = .none
+        } else {
+            currentCell?.accessoryType = .checkmark
+        }
+        
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
 }
 
