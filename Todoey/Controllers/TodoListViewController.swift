@@ -17,6 +17,8 @@ class TodoListViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        loadItems()
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -47,7 +49,6 @@ class TodoListViewController: UITableViewController {
             newItem.done = false
             self.itemsArray.append(newItem)
             self.saveItems()
-            self.tableView.reloadData()
         }
         
         alert.addTextField { (alertTextField) in
@@ -65,11 +66,40 @@ class TodoListViewController: UITableViewController {
         } catch {
             print("Error saving context \(error)")
         }
+        
+        tableView.reloadData()
 
     }
     
-    func loadItems() {
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()) {
+        do {
+            itemsArray = try context.fetch(request)
+        } catch {
+            print("Error fetching data from context \(error)")
+        }
+        
+        tableView.reloadData()
 
     }
 }
 
+extension TodoListViewController: UISearchBarDelegate {
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        let request: NSFetchRequest<Item> = Item.fetchRequest()
+        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+        
+        loadItems(with: request)
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchText.count == 0 {
+            loadItems()
+            
+            DispatchQueue.main.async {
+                searchBar.resignFirstResponder()
+            }
+        }
+    }
+}
