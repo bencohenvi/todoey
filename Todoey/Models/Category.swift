@@ -10,6 +10,7 @@ import Foundation
 import RealmSwift
 
 class Category: Object {
+    @objc dynamic var color: String = UIColor.randomFlat().hexValue()
     @objc dynamic var name: String = ""
     let items = List<Item>()
 }
